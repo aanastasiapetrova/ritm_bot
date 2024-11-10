@@ -1,1 +1,5 @@
-BOT_TOKEN='7612264519:AAGXwDCBbSVKSjvr3TBX7YPC14OWZZr0we4'
+from environs import Env
+
+env = Env()
+
+BOT_TOKEN=env.str('BOT_TOKEN', '')
