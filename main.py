@@ -3,11 +3,13 @@ import asyncio
 
 from aiogram import Bot, Dispatcher
 
+from app.db import db_start
+
 dp = Dispatcher()
 logger = logging.getLogger(__name__)
 
 async def on_startup() -> None:
-    ...
+    await db_start()
 
 async def main() -> None:
     bot = Bot()
