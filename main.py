@@ -6,6 +6,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
+from app.db import db_start
 from config import BOT_TOKEN
 from router import basic_router
 
@@ -16,7 +17,7 @@ dp.include_router(basic_router)
 
 
 async def on_startup() -> None:
-    ...
+    await db_start()
 
 async def main() -> None:
     bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
