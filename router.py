@@ -23,7 +23,7 @@ async def subscribe_handler(message: Message, bot: Bot) -> None:
     
     await bot.send_invoice(
         chat_id=message.chat.id,
-        title='Auto-subscription',
+        title='Подписка на закрытый клуб',
         description='Активация подпсики на канал на 1 месяц',
         payload='test_payload',
         currency='rub',
