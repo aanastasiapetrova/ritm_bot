@@ -4,9 +4,10 @@ from aiogram import Router, F, html, Bot
 from aiogram.filters import CommandStart
 from aiogram.types import Message, LabeledPrice, PreCheckoutQuery, ContentType, \
     ReplyKeyboardRemove, CallbackQuery
+import pytz
 
 from app import kb, db, utils
-from config import PAYMENT_TOKEN, CHANNEL_ID
+from config import PAYMENT_TOKEN, CHANNEL_ID, TIMEZONE
 
 basic_router = Router()
 PRICE = LabeledPrice(label='Sub month', amount=100 * 100) # копейки
@@ -59,7 +60,7 @@ async def process_pre_checkout_query(pre_checkout_query: PreCheckoutQuery, bot: 
 async def successful_payment(message: Message, bot: Bot):
     user = message.from_user
     try:
-        expiration_date = datetime.now() + timedelta(minutes=5)
+        expiration_date = datetime.now(tz=pytz.timezone(TIMEZONE)) + timedelta(minutes=5)
         link = await bot.create_chat_invite_link(
             chat_id=CHANNEL_ID,
             name='Приглашение в закрытый клуб',
@@ -79,8 +80,8 @@ async def successful_payment(message: Message, bot: Bot):
 async def subscription_info_handler(callback_query: CallbackQuery):
     sub_info = await db.check_user(callback_query.from_user.id)
     await callback_query.message.answer(
-        f'{html.bold('Дата начала подписки')} - {sub_info[2].strftime('%d.%m.%Y')}, \n'
-        f'{html.bold('Дата окончания подписки')} - {sub_info[3].strftime('%d.%m.%Y')}'
+        f'{html.bold('Дата начала подписки')} - {sub_info[3].strftime('%d.%m.%Y')}, \n'
+        f'{html.bold('Дата окончания подписки')} - {sub_info[4].strftime('%d.%m.%Y')}'
     )
 
 
