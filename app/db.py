@@ -3,6 +3,7 @@ import logging
 import psycopg2
 import pytz
 
+from app.constants import SPAN
 from config import TIMEZONE
 
 conn = psycopg2.connect('postgres://postgres:postgres@postgres:5432/ritm_db')
@@ -21,14 +22,14 @@ async def db_start() -> None:
         - is_sub_active - признак действительности подписки
     """
     cursor.execute('CREATE TABLE IF NOT EXISTS users(user_id INTEGER PRIMARY KEY, name TEXT, username TEXT, '
-                   'sub_start TIMESTAMP WITH TIME ZONE, sub_end TIMESTAMP WITH TIME ZONE, is_sub_active BOOLEAN);')
+                   'sub_start TIMESTAMP, sub_end TIMESTAMP, is_sub_active BOOLEAN);')
     conn.commit()
 
 
 async def add_user(user, span) -> None:
-    sub_start = datetime.now(tz=pytz.timezone(TIMEZONE))
+    sub_start = datetime.now()
     cursor.execute(f'INSERT INTO users VALUES ({user.id}, \'{user.full_name}\', \'{user.username}\',  \'{sub_start}\', '
-                   f'\'{sub_start + timedelta(weeks=4 * span)}\', true);')
+                   f'\'{sub_start + timedelta(weeks=4 * SPAN)}\', true);')
     conn.commit()
 
 
@@ -55,3 +56,12 @@ async def check_sub_expiration():
         cursor.execute('ROLLBACK')
         conn.commit()
         raise
+
+
+async def prolong_subscription(user_id):
+    cursor.execute(f'SELECT sub_end FROM users WHERE user_id = {user_id};')
+    sub_end = cursor.fetchone()[0]
+    
+    prolonged_sub_end = sub_end + timedelta(weeks=4 * SPAN)
+    cursor.execute(f'UPDATE users SET sub_end = \'{prolonged_sub_end}\', is_sub_active = true WHERE user_id = {user_id};')
+    conn.commit()

@@ -26,7 +26,7 @@ async def track_subs(bot: Bot) -> None:
                                        f'удален из канала после истечения подписки.')
     
     for user_id, sub_end in to_remind:
-        delta = (sub_end.astimezone(tz=pytz.timezone(TIMEZONE)) - datetime.now(tz=pytz.timezone(TIMEZONE)))
+        delta = (sub_end - datetime.now())
         before_expire_msg = f'{delta.seconds // 3600} час(-а/-ов)' if not delta.days else f'{delta.days} день(-я/-ей)'
         sub_end = sub_end.strftime('%d.%m.%Y')
 
