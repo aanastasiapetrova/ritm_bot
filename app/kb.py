@@ -7,6 +7,12 @@ def subscribe() -> ReplyKeyboardMarkup:
         resize_keyboard=True
     )
 
+def restore() -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text='Продлить')]],
+        resize_keyboard=True
+    )
+
 def get_subscription_info() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[[InlineKeyboardButton(text='Данные о подписке',
