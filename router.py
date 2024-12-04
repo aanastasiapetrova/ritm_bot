@@ -34,6 +34,8 @@ async def subscribe_handler(message: Message, bot: Bot) -> None:
     if has_subscription:
         await message.answer('У вас уже есть подписка!', reply_markup=ReplyKeyboardRemove())
         raise Exception(f'У пользователя с Telegram ID - {message.from_user.id} уже есть активная подписка!')
+    
+    await bot.unban_chat_member(chat_id=CHANNEL_ID, user_id=message.from_user.id)    
 
     if PAYMENT_TOKEN.split(':')[1] == 'TEST':
         await message.answer('Это тестовая отправка!')

@@ -1,7 +1,8 @@
-from datetime import datetime, timedelta
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
 import logging
 import psycopg2
-import pytz
 
 from app.constants import SPAN
 from config import TIMEZONE
@@ -29,12 +30,19 @@ async def db_start() -> None:
 async def add_user(user, span) -> None:
     sub_start = datetime.now()
     cursor.execute(f'INSERT INTO users VALUES ({user.id}, \'{user.full_name}\', \'{user.username}\',  \'{sub_start}\', '
-                   f'\'{sub_start + timedelta(weeks=4 * SPAN)}\', true);')
+                   f'\'{sub_start + relativedelta(months=SPAN)}\', true) '
+                   f'ON CONFLICT(user_id) '
+                   f'DO UPDATE SET sub_end = \'{sub_start + relativedelta(months=SPAN)}\', is_sub_active = true;')
     conn.commit()
 
 
 async def check_user(user_id):
     cursor.execute(f'SELECT * FROM users WHERE user_id = {user_id} AND is_sub_active = true;')
+    return cursor.fetchone()
+
+
+async def get_user(user_id):
+    cursor.execute(f'SELECT * FROM users WHERE user_id = {user_id};')
     return cursor.fetchone()
 
 
@@ -62,6 +70,6 @@ async def prolong_subscription(user_id):
     cursor.execute(f'SELECT sub_end FROM users WHERE user_id = {user_id};')
     sub_end = cursor.fetchone()[0]
     
-    prolonged_sub_end = sub_end + timedelta(weeks=4 * SPAN)
+    prolonged_sub_end = sub_end + relativedelta(months=SPAN)
     cursor.execute(f'UPDATE users SET sub_end = \'{prolonged_sub_end}\', is_sub_active = true WHERE user_id = {user_id};')
     conn.commit()

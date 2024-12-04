@@ -15,7 +15,7 @@ async def track_subs(bot: Bot) -> None:
     for user_id, name, username in to_remove:
         await bot.ban_chat_member(chat_id=CHANNEL_ID, user_id=user_id, until_date=int(ceil(time())) + 30)
         await bot.send_message(user_id,
-                               'Вы были исключены из закрытого клуба, поскольку срок вашей подпсики истек! \n\n'
+                               'Вы были исключены из закрытого клуба, поскольку срок вашей подписки истек! \n\n'
                                'Вы можете оформить новую подписку по кнопке ниже.',
                                reply_markup=kb.subscribe())
         
